@@ -1,23 +1,43 @@
 
+
 # Recursion shuffle exercise 1 Chapter 10
 
-def shuffle_words word
-	word.array.shuffle
-	if word >= 5
-		puts []
-	else
-		shuffle_words 
-	end
-	shuffle_words word
+def shuffle array
+	array.sort_by{rand}
 end
 
-word_string = ''
+p(shuffle([9, 8, 7, 6, 5, 4, 3, 2, 1]))
+
 
 # Exercise 2 Chapter 10 Dictionary sort
 
-def dictionary_sort
-	[].sort.by_alphabet
+def dictionary_sort array
+	dic_sort array, []
 end
+
+def dic_sort unsorted, sorted
+	if unsorted.length <= 0
+		return sorted
+	end
+
+smallest = unsorted.pop
+still_unsorted = []
+
+unsorted.each do |done|
+	if done.downcase < smallest.downcase
+		still_unsorted.push smallest
+		smallest = done
+	else
+		still_unsorted.push done
+	end
+end
+
+sorted.push smallest
+
+dic_sort still_unsorted, sorted
+end
+
+puts (dictionary_sort(['nano', 'bottle', 'corona', 'item', 'tuna', 'Nano', 'Tuna']))
 
 # Extended exercise Chapter 10 
 
@@ -93,9 +113,6 @@ end
 puts english_number(8)
 puts english_number(1000)
 puts english_number(91)
-
-
-
 
 
 

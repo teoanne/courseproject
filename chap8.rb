@@ -1,4 +1,3 @@
-
 # Chapter 8: Array exercise 1 - building and sorting an array
 
 puts 'Write as many words as you like: '
@@ -17,7 +16,7 @@ puts typed.sort
 # Chapter 8 Arrays exercise 2 Table of Contents
 
 title = ['Table of Contents'] 
-chapters = [['Getting Started', 1], ['Numbers', 9], ['Letters', 1]]
+chapters = [['Getting Started', 1], ['Numbers', 9], ['Letters', 14]]
 
 puts title
 puts
