@@ -58,14 +58,14 @@ while true
 	end
 end
 
-# exercise on elseif
+# exercise on elsif
 
 puts 'Hello, what\'s your name?'
 name = gets.chomp
 puts 'Hello ' + name + '.'
 if name == 'Chris'
 	puts 'What a lovely name!'
-elseif name == 'Anne'
+elsif name == 'Anne'
   puts 'What a lovely name!'
 end
 
