@@ -37,13 +37,13 @@ name = gets.chomp
 if name == name.capitalize
   puts 'Please take a seat ' + name + '.'
 else
-	puts name + '? You mean ' + name.capitalize + ' right?'
-	puts 'Don\'t you even know how to spell your name?'
+  puts name + '? You mean ' + name.capitalize + ' right?'
+  puts 'Don\'t you even know how to spell your name?'
 reply = gets.chomp
 if reply.downcase == 'yes'
-	puts 'Sit down'
+  puts 'Sit down'
 else
-	puts 'You spell your name starting with the capital letter.'
+  puts 'You spell your name starting with the capital letter.'
 end
 puts 'You\'re Done'
 end
@@ -51,11 +51,11 @@ end
 # While loops 
 
 while true
-	input = gets.chomp
-	puts input
-	if input == 'bye'
-		break
-	end
+  input = gets.chomp
+  puts input
+  if input == 'bye'
+    break
+  end
 end
 
 # exercise on elsif
@@ -64,7 +64,7 @@ puts 'Hello, what\'s your name?'
 name = gets.chomp
 puts 'Hello ' + name + '.'
 if name == 'Chris'
-	puts 'What a lovely name!'
+  puts 'What a lovely name!'
 elsif name == 'Anne'
   puts 'What a lovely name!'
 end
@@ -75,7 +75,7 @@ puts 'Hello, what\'s your name?'
 name = gets.chomp
 puts 'Hello ' + name + '.'
 if name == 'Chris' || name == 'Anne'
-	puts 'What a lovely name!'
+  puts 'What a lovely name!'
 end
 
 # exercise on other logical operators && (and) ! (not)
