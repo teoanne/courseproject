@@ -1,3 +1,9 @@
+require 'pry'
+
+puts "Hi, welcome to Blackjack. What's your name?"
+player_name = gets.chomp.capitalize
+puts "Hi #{player_name}. Here are the cards."
+
 # first of all, have a method to calculate everything to be used throughout the program
 
 def calculatetotal(cards) # calculating the total of the two cards dealt, first to player then to dealer
@@ -20,6 +26,18 @@ array.select {|card| card.include?("A")}.count.times do
 end
 total # don't forget to include total here before exiting. IMPORTANT!!
 end # ends the calculatetotal method
+
+=begin
+def continue
+  puts "Would you like to continue playing? Please answer 'yes' or 'no'"
+  reply = gets.chomp.downcase
+  if reply == 'no'
+    exit
+  else
+    deck.shuffle!
+  end
+end
+=end
 
 # The deck of cards
 
@@ -60,6 +78,7 @@ puts "Dealer's cards are: #{dealer_cards[0]} and #{dealer_cards[1]} for a total 
 if mytotal == 21 # simple case of blackjack win
   puts "Congrats you got blackjack!"
 exit
+#continue
 end
 
 while mytotal < 21 # if below 21, choose to hit or stay. note that if hit, a new card should be given to the player, if stay, it is dealer's turn
@@ -87,9 +106,11 @@ while mytotal < 21 # if below 21, choose to hit or stay. note that if hit, a new
 if mytotal == 21 # blackjack win after going through hit 
   puts "Yay! Blackjack! You win!"
   exit
+  # continue
   elsif mytotal > 21
   puts "Sorry mate, you are busted"
   exit
+  #continue
 end
 
 end # ends the while loop
