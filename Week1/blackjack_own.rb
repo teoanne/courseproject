@@ -20,7 +20,7 @@ def calculatetotal(cards) # calculating the total of the two cards dealt, first 
   end
 end # finished the array
 
-# Correcting Aces in case there are more than one. It should convert aces to 1 instead of 11 if more than 1
+# Correcting Aces in case there are more than one. It should convert aces to 1 instead of 11 if total is more than 21
 array.select {|card| card.include?("A")}.count.times do
   total -= 10 if total > 21
 end
