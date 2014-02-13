@@ -74,7 +74,7 @@ a = ['a', 'b,', '{a:4, b:3, s:7}']
 
 # 15. Look at several Rails/Ruby online API sources and say which one your like best and why.
 
-puts "Delete and Pop methods"
+puts "Product and Pop methods"
 
 
 
