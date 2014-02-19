@@ -1,0 +1,18 @@
+<h3>Hi <%= session[:player_name] %></h3>
+<h3>Your cards are:</h3>
+
+<%= session[:player_cards] %>
+<p>Your total is <%= session[:player_total] %></p>
+
+<a href=""><div class='btn btn-primary'>Hit</div></a>
+
+<p>Stay</p>
+
+<h3>Dealer's cards are </h3>
+
+<%= session[:dealer_cards] %>
+
+<p>Dealer's total is <%= session[:dealer_total] %></p>
+
+<input type="submit" class="btn btn-primary"></input>
+
