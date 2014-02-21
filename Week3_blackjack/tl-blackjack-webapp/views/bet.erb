@@ -1,7 +1,13 @@
+<div class='well'>
 <h3>Welcome, <%= session[:player_name] %> </h3>
-<p>You have <%= @amount %> to start the game with.</p>
-<p>How much would you like to bet?<p>
-  <form action='gosomewhere' method='post'>
+  <% if session[:current_total_amount] %>
+    <p>You now $<%= session[:current_total_amount] %> to play with.</p>
+  <% else %>
+    <p>You have $<%= @amount %> to start the game with.</p>
+  <% end %>
+    <p>How much would you like to bet?<p>
+  <form action='/player_bet' method='post'>
     <input type='integer' name='player_bet' placeholder='Type an amount here'></input>
+    <input type='submit' class='btn btn-primary' value='Proceed?'>
   </form>
-<div class="btn btn-primary"><a href='#'>Proceed?</a><div>
+</div>

@@ -1,18 +1,32 @@
-<h3>Hi <%= session[:player_name] %></h3>
-<h3>Your cards are:</h3>
+<div class='well'>
+  <h3>Hi <%= session[:player_name] %></h3>
+  <h3>Your cards are:</h3>
+    <% session[:player_cards].each do |card| %>
+     <%= card_images(card) %>
+    <% end %>
+    <br>
+<p>Your total is <%= calculate_total(session[:player_cards]) %></p> 
+  <% if @hit_or_stay %> 
+    <h4>Do you feel lucky?</h4>
+      <form id='hit_button' action='/game/player/hit' method='post'>
+        <input type='submit' value='Hit' class='btn btn-success'>
+      </form>
+      <form id='stay_button' action='/game/player/stay' method='post'>
+        <input type='submit' value='Stay' class='btn btn-danger'>
+      </form>
+  <% end %>
+</div>
 
-<%= session[:player_cards] %>
-<p>Your total is <%= session[:player_total] %></p>
-
-<a href=""><div class='btn btn-primary'>Hit</div></a>
-
-<p>Stay</p>
-
-<h3>Dealer's cards are </h3>
-
-<%= session[:dealer_cards] %>
-
-<p>Dealer's total is <%= session[:dealer_total] %></p>
-
-<input type="submit" class="btn btn-primary"></input>
-
+<div class='well'>
+  <h3>Dealer's cards are: </h3>
+      <% session[:dealer_cards].each do |card| %>
+        <%= card_images(card) %>
+      <% end %>
+      <br>
+  <p>Dealer's total is <%= calculate_total(session[:dealer_cards]) %></p>
+    <% if !@hit_or_stay %>
+  <form action='/game/dealer/hit' method='post'>
+    <input type='submit' value='Issue dealer card' class='btn btn-success'>
+  </form>
+  <% end %>
+</div>
