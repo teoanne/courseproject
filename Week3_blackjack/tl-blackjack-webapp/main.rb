@@ -4,7 +4,11 @@ require 'pry'
 
 set :sessions, true
 
+# CONSTANTS
+
 BLACKJACK = 21
+
+# HELPERS
 
 helpers do
   
@@ -50,11 +54,11 @@ helpers do
   def current_total_amount
     if calculate_total(session[:player_cards]).to_i == 21
       @amount.to_i + session[:player_bet].to_i 
-    elsif calculate_total(session[:player_cards]).to_i > 21
+    elsif calculate_total(session[:player_cards]).to_i > BLACKJACK
       @amount.to_i - session[:player_bet].to_i
-    elsif calculate_total(session[:dealer_cards]).to_i > 21
+    elsif calculate_total(session[:dealer_cards]).to_i > BLACKJACK
       @amount.to_i + session[:player_bet].to_i 
-    elsif calculate_total(session[:dealer_cards]).to_i == 21
+    elsif calculate_total(session[:dealer_cards]).to_i == BLACKJACK
       @amount.to_i - session[:player_bet].to_i
     elsif calculate_total(session[:player_cards]).to_i > calculate_total(session[:dealer_cards]).to_i
       @amount.to_i + session[:player_bet].to_i 
@@ -65,18 +69,45 @@ helpers do
     def compare_winner
       if calculate_total(session[:player_cards]).to_i > calculate_total(session[:dealer_cards]).to_i
         @success = 'Congratulations, you have the higher score. You win! Your total is now #{current_total_amount}'
+        current_total_amount = session[:current_total_amount]
       else
         @error = "Sorry, the Dealer's total is higher. Better luck next time #{session[:player_name]}."
       end
     end # ends compare winner method
 
+    def winner!(message)
+      @success = "<strong>Congratulations! #{session[:player_name]} won.</strong> #{message}" 
+      @hit_or_stay = false 
+      @play_again = true
+    end
+
+    def loser!(message)
+      @error = "<strong>Sorry, #{session[:player_name]} lost.</strong> #{message}"
+      @hit_or_stay = false
+      @play_again = true
+    end
+
+    def tie!(message)
+      @info = "<strong>That was a lucky break. Its a tie.</strong> #{message}"
+      @hit_or_stay = false
+      @play_again = true
+    end
+
 end # ends Helpers
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# BEFORE
 
 before do
   @hit_or_stay = true
   @amount = 500
   # @updated_amount = 
 end
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# MAIN PAGE
 
 get '/' do
   if session[:player_name]
@@ -95,6 +126,7 @@ end
 post '/new_form' do
   if params[:player_name].empty?
   @error = 'You are required to enter your name in order to play.'
+   @message = "Welcome to Blackjack, please enter your name before proceeding."
   halt erb(:name)
   end
 
@@ -102,6 +134,29 @@ post '/new_form' do
   redirect '/bet'
 end
 
+#++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# GAMEPLAY
+
+get '/game' do
+  session[:turn] = session[:player_name]
+  suits = ["Hearts", "Clubs", "Diamonds", "Spades"]
+  cardnumbers = ["2", "3", "4", "5", "6", "7", "8", "9", "J", "Q", "K", "A"]
+  session[:deck] = suits.product(cardnumbers).shuffle!
+  #starting off with player and dealer cards
+  session[:player_cards] = []
+  session[:dealer_cards] = []
+  session[:player_cards] << session[:deck].pop
+  session[:dealer_cards] << session[:deck].pop
+  session[:player_cards] << session[:deck].pop
+  session[:dealer_cards] << session[:deck].pop
+  player_total = calculate_total(session[:player_cards]).to_i
+  if player_total == BLACKJACK
+    winner!("Congratulations, you hit Blackjack! You now have $#{current_total_amount}")
+    current_total_amount = session[:current_total_amount]
+  end
+  erb :game
+end
 
 post '/hit' do 
 
@@ -115,13 +170,15 @@ post '/stay' do
   redirect '/game'
 end
 
-get '/bet' do # shows bet form
-  if session[:player_name].empty?
-    @error = 'Please go back and enter your name before placing a bet.'
-    halt erb(:name)
-  end
-  @amount unless session[:current_total_amount] # not working
-  erb :bet
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+#BET PAGE
+
+get '/bet' do # shows bet form  
+
+  @amount # not working
+  erb(:bet)
+  
 end
 
 post '/player_bet' do # processes bet form. Bet amount cannot be empty
@@ -139,79 +196,95 @@ post '/player_bet' do # processes bet form. Bet amount cannot be empty
   redirect '/game'
 end
 
+#++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# PLAYER TURN
+
 get '/player_play_again' do
   session[:current_total_amount]
   erb :game
 end
 
-=begin
-get '/finished' do
-
-  erb :finished
-end
-=end
-get '/logout' do
-  session[:player_name] = false
-  redirect '/'
-end
-
 post '/game/player/hit' do
   session[:player_cards] << session[:deck].pop
-  if calculate_total(session[:player_cards]).to_i > 21
-    @error = "Sorry, the total is more than 21. You are busted. You now have $#{current_total_amount} left in your balance."
-    @hit_or_stay = false
-    current_total_amount = session[:current_total_amount] #NOTE!
-  elsif calculate_total(session[:player_cards]).to_i == 21
-    @success = "Congratulations, you hit Blackjack! You have a total of $#{current_total_amount}."
-    @hit_or_stay = false
+  player_total = calculate_total(session[:player_cards]).to_i
+  if player_total > BLACKJACK
+    loser!("The total is more than 21. You are busted. You now have $#{current_total_amount} left in your balance.") #NOTE!
+    current_total_amount = session[:current_total_amount]
+  elsif player_total == BLACKJACK
+    winner!("You hit Blackjack! You have a total of $#{current_total_amount}.")
+    current_total_amount = session[:current_total_amount]
   end
   erb :game
 end
 
 post '/game/player/stay' do
-  @info = "You have chosen to stay. It is now the Dealer's turn."
+  player_total = calculate_total(session[:player_cards]).to_i
+  @info = "You have chosen to stay at #{player_total}. It is now the Dealer's turn." # there is an issue here with this display
+  redirect '/game/dealer'
+end
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# DEALER TURN
+
+get '/game/dealer' do 
+  session[:turn] = "dealer"
   @hit_or_stay = false
+  dealer_total = calculate_total(session[:dealer_cards]).to_i
+    if dealer_total == BLACKJACK
+      loser!("Dealer got Blackjack. Better luck next time. Your total is now $#{current_total_amount}")
+      current_total_amount = session[:current_total_amount]
+    elsif dealer_total > BLACKJACK
+      winner!("The Dealer's total is #{dealer_total}. The Dealer is busted. Your total is now $#{current_total_amount}.")
+      current_total_amount = session[:current_total_amount]
+    elsif dealer_total >= 17
+      @info = "Dealer will stay at #{dealer_total}. We will now compare scores."
+      redirect '/game/compare_winner'
+    else
+      @dealer_hit_button = true
+    end # ends if statement
   erb :game
 end
 
 post '/game/dealer/hit' do
-  while calculate_total(session[:dealer_cards]).to_i < 17
-    session[:dealer_cards] << session[:deck].pop
-    if calculate_total(session[:dealer_cards]).to_i > 21
-      @error = "The total is more than 21. The Dealer is busted. You win. Your total is now #{current_total_amount}"
-      @hit_or_stay = false
-    elsif calculate_total(session[:dealer_cards]).to_i == 21
-      @success = "Sorry #{session[:player_name]}, Dealer got Blackjack. Better luck next time."
-      @hit_or_stay = false
-    else
-      @info = 'Dealer will stay.'
-      compare_winner
-    end # ends if statement
-  end #ends while statement
-  erb :game
-end
-=begin
-post '/game/dealer/stay' do
-  @info = "The Dealer will stay."
-  erb :game
-end
-=end
-
-get '/game' do
-  suits = ["Hearts", "Clubs", "Diamonds", "Spades"]
-  cardnumbers = ["2", "3", "4", "5", "6", "7", "8", "9", "J", "Q", "K", "A"]
-  session[:deck] = suits.product(cardnumbers).shuffle!
-  #starting off with player and dealer cards
-  session[:player_cards] = []
-  session[:dealer_cards] = []
-  session[:player_cards] << session[:deck].pop
   session[:dealer_cards] << session[:deck].pop
-  session[:player_cards] << session[:deck].pop
-  session[:dealer_cards] << session[:deck].pop
-  erb :game
-  # where does the game logic go? 
+  redirect '/game/dealer'
 end
 
+#++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# COMPARE WINNER
+
+get '/game/compare_winner' do
+  @hit_or_stay = false
+  dealer_total = calculate_total(session[:dealer_cards]).to_i
+  player_total = calculate_total(session[:player_cards]).to_i
+  @info = "Dealer stays at #{dealer_total}." 
+  if dealer_total > player_total
+    loser!("Dealer has the higher score. Your total is now $#{current_total_amount}.")
+    current_total_amount = session[:current_total_amount]
+  elsif player_total > dealer_total
+    winner! ("You have the higher score. Your total is now $#{current_total_amount}.")
+    current_total_amount = session[:current_total_amount]
+  else
+    tie!("Both totals are #{dealer_total}. Your total is now $#{current_total_amount}.")
+    current_total_amount = session[:current_total_amount]
+  end
+  erb :game
+end # ends compare winner
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# END GAME - LOGOUT
+
+get '/logout' do
+  @info = 'You are now logged out. Thanks for playing.'
+  session[:player_name] = false
+  redirect '/'
+end
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
 
